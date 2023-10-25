@@ -8,9 +8,6 @@
 
 #include "Game.h"
 #include "Actors/Actor.h"
-#include "Actors/Block.h"
-#include "Actors/Mario.h"
-#include "Actors/Spawner.h"
 #include "Components/ColliderComponents/AABBColliderComponent.h"
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Random.h"
@@ -34,7 +31,7 @@ bool Game::Initialize() {
         return false;
     }
 
-    mWindow = SDL_CreateWindow("P4: Super Mario Bros", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWindowWidth, mWindowHeight, 0);
+    mWindow = SDL_CreateWindow("Super Capi Fighters", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, mWindowWidth, mWindowHeight, SDL_WINDOW_RESIZABLE);
     if (!mWindow) {
         SDL_Log("Failed to create window: %s", SDL_GetError());
         return false;
@@ -107,14 +104,6 @@ void Game::UpdateGame() {
 
 void Game::UpdateCamera() {
 
-    if (newCameraX > mCameraPos.x) {
-        if (newCameraX < 0)
-            mCameraPos.x = 0;
-        else if (newCameraX > LEVEL_WIDTH * TILE_SIZE - mWindowWidth)
-            mCameraPos.x = LEVEL_WIDTH * TILE_SIZE - mWindowWidth;
-        else
-            mCameraPos.x = newCameraX;
-    }
 }
 
 void Game::UpdateActors(float deltaTime) {
