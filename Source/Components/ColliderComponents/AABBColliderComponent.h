@@ -12,9 +12,7 @@
 enum class ColliderLayer
 {
     Player,
-    Enemy,
-    Blocks,
-    Shell
+    Block,
 };
 
 enum class CollisionSide
@@ -47,7 +45,10 @@ public:
     Vector2 GetCenter() const;
     ColliderLayer GetLayer() const { return mLayer; }
 
-    void SetHeight(int height) { mHeight = height; }
+    void SetSize(int width, int height) {
+        mWidth = width;
+        mHeight = height;
+    }
 
 private:
     Overlap GetMinOverlap(AABBColliderComponent* b) const;

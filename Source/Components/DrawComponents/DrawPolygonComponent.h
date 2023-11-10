@@ -9,7 +9,9 @@ class DrawPolygonComponent : public DrawComponent
 {
 public:
     // (Lower draw order corresponds with further back)
-    DrawPolygonComponent(class Actor* owner, std::vector<Vector2> &vertices, int drawOrder = 100);
+    DrawPolygonComponent(class Actor* owner, int width, int height, int drawOrder = 100);
+
+    void Update(int width, int height);
 
     void Draw(SDL_Renderer* renderer) override;
     std::vector<Vector2>& GetVertices() { return mVertices; }

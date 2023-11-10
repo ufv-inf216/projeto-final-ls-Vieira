@@ -6,6 +6,7 @@
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
 #include "../../Json.h"
+#include "DrawPolygonComponent.h"
 #include <fstream>
 
 DrawAnimatedComponent::DrawAnimatedComponent(class Actor *owner, const std::string &spriteSheetPath, const std::string &spriteSheetData, int drawOrder)
@@ -29,12 +30,12 @@ void DrawAnimatedComponent::LoadSpriteSheet(const std::string &texturePath, cons
     nlohmann::json spriteSheetData = nlohmann::json::parse(spriteSheetFile);
 
     SDL_Rect *rect = nullptr;
-    for (const auto &frame : spriteSheetData["frames"]) {
+    for (const auto &frame : spriteSheetData) {
 
-        int x = frame["frame"]["x"].get<int>();
-        int y = frame["frame"]["y"].get<int>();
-        int w = frame["frame"]["w"].get<int>();
-        int h = frame["frame"]["h"].get<int>();
+        int x = frame["x"].get<int>();
+        int y = frame["y"].get<int>();
+        int w = frame["width"].get<int>();
+        int h = frame["height"].get<int>();
         rect = new SDL_Rect({x, y, w, h});
 
         mSpriteSheetData.emplace_back(rect);
@@ -45,7 +46,14 @@ void DrawAnimatedComponent::Draw(SDL_Renderer *renderer) {
     int spriteIdx = mAnimations[mAnimName][int(mAnimTimer)];
 
     Vector2 drawPosition = mOwner->GetPosition() - GetGame()->GetCameraPos();
-    SDL_Rect mDrawRect = {int(drawPosition.x), int(drawPosition.y), mSpriteSheetData[spriteIdx]->w, mSpriteSheetData[spriteIdx]->h};
+
+    int width = mSpriteSheetData[spriteIdx]->w * 3;
+    int heigth = mSpriteSheetData[spriteIdx]->h * 3;
+
+    mOwner->GetComponent<AABBColliderComponent>()->SetSize(width, heigth);
+    mOwner->GetComponent<DrawPolygonComponent>()->Update(width, heigth);
+
+    SDL_Rect mDrawRect = {int(drawPosition.x), int(drawPosition.y), width, heigth};
     SDL_RendererFlip flip = mOwner->GetRotation() == 0.0f ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
     SDL_RenderCopyEx(renderer, mSpriteSheetSurface, mSpriteSheetData[spriteIdx], &mDrawRect, mOwner->GetRotation(), nullptr, flip);
 }

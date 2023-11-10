@@ -35,6 +35,10 @@ add_executable(${PROJECT_NAME}
         Source/Components/ColliderComponents/AABBColliderComponent.h
         Source/Components/DrawComponents/DrawAnimatedComponent.cpp
         Source/Components/DrawComponents/DrawAnimatedComponent.h
+        Source/Actors/Player.cpp
+        Source/Actors/Player.h
+        Source/Actors/Ground.cpp
+        Source/Actors/Ground.h
 )
 
 ####### DO NOT EDIT BELLOW

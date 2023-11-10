@@ -28,6 +28,9 @@ public:
     // Add an animation of the corresponding name to the animation map
     void AddAnimation(const std::string& name, const std::vector<int>& images);
 
+    // Get the current animation name
+    const std::string& GetAnimName() const { return mAnimName; }
+
 private:
     void LoadSpriteSheet(const std::string& texturePath, const std::string& dataPath);
 

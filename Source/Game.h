@@ -47,7 +47,6 @@ public:
     SDL_Texture* LoadTexture(const std::string& texturePath);
 
     // Game-specific
-    const class Mario* GetMario() { return mMario; }
 
 private:
     void ProcessInput();
@@ -56,7 +55,7 @@ private:
     void GenerateOutput();
 
     // Game-specific
-    void LoadLevel(const std::string& texturePath, int width, int height);
+    void LoadLevel();
 
     // All the actors in the game
     std::vector<class Actor*> mActors;
@@ -86,5 +85,6 @@ private:
     Vector2 mCameraPos;
 
     // Game-specific
-    class Mario *mMario;
+    class Player *mPlayer1;
+    class Player *mPlayer2;
 };

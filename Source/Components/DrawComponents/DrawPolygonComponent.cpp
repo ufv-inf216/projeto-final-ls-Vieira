@@ -6,11 +6,11 @@
 #include "../../Actors/Actor.h"
 #include "../../Game.h"
 
-DrawPolygonComponent::DrawPolygonComponent(class Actor* owner, std::vector<Vector2> &vertices, int drawOrder)
+DrawPolygonComponent::DrawPolygonComponent(class Actor* owner, int width, int height, int drawOrder)
         :DrawComponent(owner)
-        ,mVertices(vertices)
         ,mDrawOrder(drawOrder)
 {
+    mVertices = {Vector2(0, 0), Vector2(width, 0), Vector2(width, height), Vector2(0, height)};
 }
 
 void DrawPolygonComponent::Draw(SDL_Renderer *renderer)
@@ -34,4 +34,10 @@ void DrawPolygonComponent::Draw(SDL_Renderer *renderer)
                                  pos.y + mVertices[mVertices.size() - 1].y - cameraPos.y,
                                  pos.x + mVertices[0].x - cameraPos.x,
                                  pos.y + mVertices[0].y - cameraPos.y);
+}
+
+void DrawPolygonComponent::Update(int width, int height) {
+    std::vector<Vector2> vertices = {Vector2(0, 0), Vector2(width, 0), Vector2(width, height), Vector2(0, height)};
+    mVertices = vertices;
+
 }

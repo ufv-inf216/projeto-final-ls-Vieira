@@ -12,14 +12,12 @@
 #include "Components/DrawComponents/DrawComponent.h"
 #include "Random.h"
 #include "SDL_image.h"
+#include "Components/DrawComponents/DrawSpriteComponent.h"
 #include <algorithm>
 #include <fstream>
 #include <vector>
-
-const int LEVEL_WIDTH = 250;
-const int LEVEL_HEIGHT = 14;
-const int TILE_SIZE = 32;
-const float SPAWN_DISTANCE = 780.0f;
+#include "Actors/Player.h"
+#include "Actors/Ground.h"
 
 Game::Game(int windowWidth, int windowHeight)
     : mWindow(nullptr), mRenderer(nullptr), mTicksCount(0), mIsRunning(true), mUpdatingActors(false), mWindowWidth(windowWidth), mWindowHeight(windowHeight) {
@@ -54,9 +52,25 @@ bool Game::Initialize() {
 }
 
 void Game::InitializeActors() {
+    LoadLevel();
+
+    Vector2 player1Position = Vector2(100.0f, mWindowHeight - 32.0f - 330.0f);
+    Vector2 player2Position = Vector2(mWindowWidth - 100.0f - 330.0f, mWindowHeight - 32.0f - 330.0f);
+
+    mPlayer1 = new Player(this, player1Position, 1);
+    mPlayer1->SetPosition(player1Position);
+    mPlayer2 = new Player(this, player2Position, 2);
+    mPlayer2->SetPosition(player2Position);
 }
 
-void Game::LoadLevel(const std::string &levelPath, const int width, const int height) {
+void Game::LoadLevel() {
+    // Add background image located at Assets/Levels/Arena.png
+    auto* background = new Actor(this);
+    background->SetPosition(Vector2(0.0f, 0.0f));
+    new DrawSpriteComponent(background, "../Assets/Sprites/Arena.png", mWindowWidth, mWindowHeight);
+
+    float blockHeight = 50.0f;
+    auto* ground = new Ground(this, Vector2(0, mWindowHeight - blockHeight));
 }
 
 void Game::RunLoop() {
