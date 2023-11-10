@@ -67,7 +67,7 @@ void Game::LoadLevel() {
     // Add background image located at Assets/Levels/Arena.png
     auto* background = new Actor(this);
     background->SetPosition(Vector2(0.0f, 0.0f));
-    new DrawSpriteComponent(background, "../Assets/Sprites/Arena.png", mWindowWidth, mWindowHeight);
+    new DrawSpriteComponent(background, "../Assets/Sprites/Background.jpg", mWindowWidth, mWindowHeight);
 
     float blockHeight = 50.0f;
     auto* ground = new Ground(this, Vector2(0, mWindowHeight - blockHeight));

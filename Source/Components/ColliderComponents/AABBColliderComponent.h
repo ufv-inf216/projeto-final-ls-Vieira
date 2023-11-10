@@ -50,6 +50,9 @@ public:
         mHeight = height;
     }
 
+    float GetWidth() const { return mWidth; }
+    float GetHeight() const { return mHeight; }
+
 private:
     Overlap GetMinOverlap(AABBColliderComponent* b) const;
     void ResolveCollisions(RigidBodyComponent *rigidBody, const Overlap& minOverlap);

@@ -89,11 +89,11 @@ void Player::OnProcessInput(const uint8_t *state) {
 }
 
 void Player::OnUpdate(float deltaTime) {
-    if (mRigidBodyComponent->GetVelocity().x < 0 && mRigidBodyComponent->GetOwner()->GetPosition().x < mGame->GetCameraPos().x)
+    if (mRigidBodyComponent->GetOwner()->GetPosition().x < mGame->GetCameraPos().x)
         mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetCameraPos().x, mRigidBodyComponent->GetOwner()->GetPosition().y));
 
-    if (mRigidBodyComponent->GetVelocity().x > 0 && mRigidBodyComponent->GetOwner()->GetPosition().x > mGame->GetWindowWidth())
-        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetWindowWidth(), mRigidBodyComponent->GetOwner()->GetPosition().y));
+    if (mRigidBodyComponent->GetOwner()->GetPosition().x + mColliderComponent->GetWidth()> mGame->GetWindowWidth())
+        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetWindowWidth() - mColliderComponent->GetWidth(), mRigidBodyComponent->GetOwner()->GetPosition().y));
 
     ManageAnimations();
 }
@@ -117,13 +117,9 @@ void Player::Kill() {
 }
 
 void Player::OnCollision(std::unordered_map<CollisionSide, AABBColliderComponent::Overlap> &responses) {
-//    if(responses.empty())
-//        SetOffGround();
-
     for (auto &response : responses) {
         if (response.second.side == CollisionSide::Down) {
             SetOnGround();
-            mIsOnGround = true;
         }
 //
 //        if(response.second.target->GetLayer() == ColliderLayer::Enemy){
