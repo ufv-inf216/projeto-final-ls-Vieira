@@ -16,7 +16,7 @@ Ground::Ground(Game* game, Vector2 position)
 
     float width = game->GetWindowWidth();
     float heigth = game->GetWindowHeight() - position.y;
-    mColliderComponent = new AABBColliderComponent(this, 0,0, width, heigth, ColliderLayer::Block);
+    mColliderComponent = new AABBColliderComponent(this, 0,0, width, heigth, ColliderLayer::Ground);
     mColliderComponent->SetEnabled(true);
 
     mRigidBodyComponent = new RigidBodyComponent(this, 10.0f, 1.0f, 1, true);

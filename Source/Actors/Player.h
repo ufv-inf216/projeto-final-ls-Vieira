@@ -31,6 +31,8 @@ private:
     float mForwardSpeed;
     float mJumpSpeed;
 
+    float mIsPressingJump;
+
     int mPlayerNumber;
 };
 

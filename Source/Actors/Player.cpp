@@ -13,6 +13,7 @@ Player::Player(Game *game, Vector2 position, int playerNumber, float forwardSpee
         : Actor(game),
           mIsMoving(false),
           mPlayerNumber(playerNumber),
+          mIsPressingJump(false),
           mIsDead(false),
           mForwardSpeed(forwardSpeed),
           mJumpSpeed(jumpSpeed) {
@@ -38,8 +39,6 @@ Player::Player(Game *game, Vector2 position, int playerNumber, float forwardSpee
 
     mDrawComponent->SetAnimation("idle");
     mDrawComponent->SetAnimFPS(9.0f);
-
-
 }
 
 void Player::OnProcessInput(const uint8_t *state) {
@@ -106,6 +105,7 @@ void Player::ManageAnimations() {
     } else if(mIsOnGround && mIsMoving) {
         mDrawComponent->SetAnimation("move");
     } else if(!mIsOnGround) {
+        printf("jump\n");
         mDrawComponent->SetAnimation("jump");
     }
 }
@@ -118,10 +118,13 @@ void Player::Kill() {
 
 void Player::OnCollision(std::unordered_map<CollisionSide, AABBColliderComponent::Overlap> &responses) {
     for (auto &response : responses) {
-        if (response.second.side == CollisionSide::Down) {
+        if(!mIsPressingJump){
+
+        if (response.second.side == CollisionSide::Down && response.second.target->GetLayer() == ColliderLayer::Ground) {
             SetOnGround();
         }
-//
+        }
+
 //        if(response.second.target->GetLayer() == ColliderLayer::Enemy){
 //            if (response.second.side == CollisionSide::Down) {
 //                mRigidBodyComponent->SetVelocity(Vector2(mRigidBodyComponent->GetVelocity().x, mJumpSpeed/1.5f));
