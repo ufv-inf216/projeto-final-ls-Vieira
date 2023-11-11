@@ -17,6 +17,7 @@ enum class CharacterState {
     Move,
     Jump,
     Down,
+    Block,
     Punch,
     Kick,
     Dead

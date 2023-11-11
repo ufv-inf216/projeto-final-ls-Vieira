@@ -17,9 +17,11 @@ const std::vector<int> Character::GetStateArray(CharacterSelect character, Chara
                 case CharacterState::Move:
                     return {18, 19, 20, 21, 22, 23};
                 case CharacterState::Jump:
-                    return {33, 34, 35, 36, 37, 38, 39, 40};
+                    return {33, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40};
                 case CharacterState::Down:
-                    return {41, 42, 43, 44, 45, 46, 47, 48};
+                    return {14, 15, 16, 17};
+                case CharacterState::Block:
+                    return {24, 25, 26};
                 case CharacterState::Punch:
                     return {49, 50, 51, 52, 53, 54, 55, 56};
                 case CharacterState::Kick:
@@ -30,13 +32,15 @@ const std::vector<int> Character::GetStateArray(CharacterSelect character, Chara
         case CharacterSelect::Vegeta:
             switch (state) {
                 case CharacterState::Idle:
-                    return {10, 11, 12, 13};
+                    return {9, 10, 11, 12};
                 case CharacterState::Move:
                     return {18, 19, 20, 21, 22, 23};
                 case CharacterState::Jump:
-                    return {33, 34, 35, 36, 37, 38, 39, 40};
+                    return {33, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40};
                 case CharacterState::Down:
-                    return {41, 42, 43, 44, 45, 46, 47, 48};
+                    return {14, 15, 16, 17};
+                case CharacterState::Block:
+                    return {24, 25, 26};
                 case CharacterState::Punch:
                     return {49, 50, 51, 52, 53, 54, 55, 56};
                 case CharacterState::Kick:

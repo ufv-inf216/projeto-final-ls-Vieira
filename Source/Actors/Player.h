@@ -34,6 +34,9 @@ private:
     bool mIsDead;
     bool mIsOnGround;
     bool mIsJumping;
+    bool mIsBlocking;
+    bool mIsPunching;
+    bool mIsKicking;
     bool mIsDown;
 
     int mPlayerNumber;

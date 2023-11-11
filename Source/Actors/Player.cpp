@@ -21,6 +21,9 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
           mIsOnGround(true),
           mIsJumping(false),
           mIsDown(false),
+          mIsBlocking(false),
+          mIsPunching(false),
+          mIsKicking(false),
           mIsMoving(false) {
 
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 2.5f);
@@ -40,12 +43,20 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
     mDrawComponent->AddAnimation("move", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Move));
     mDrawComponent->AddAnimation("jump", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Jump));
     mDrawComponent->AddAnimation("down", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Down));
+    mDrawComponent->AddAnimation("block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Block));
+    mDrawComponent->AddAnimation("punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Punch));
+    mDrawComponent->AddAnimation("kick", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Kick));
+    mDrawComponent->AddAnimation("dead", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Dead));
 
     mDrawComponent->SetAnimation("idle");
-    mDrawComponent->SetAnimFPS(9.0f);
+    mDrawComponent->SetAnimFPS(7.0f);
 }
 
 void Player::OnProcessInput(const uint8_t *state) {
+        if(state[SDL_SCANCODE_ESCAPE]){
+            mIsDead = true;
+        }
+
         if (mPlayerNumber == 1 && state[SDL_SCANCODE_D] || mPlayerNumber == 2 && state[SDL_SCANCODE_RIGHT]) {
             mRigidBodyComponent->ApplyForce(Vector2(mForwardSpeed, 0.0f));
             mIsMoving = true;
@@ -68,6 +79,30 @@ void Player::OnProcessInput(const uint8_t *state) {
             }
         } else {
             mIsJumping = false;
+
+            if(mPlayerNumber == 1 && state[SDL_SCANCODE_E] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_1]) {
+                mIsBlocking = true;
+                mIsPunching = false;
+                mIsKicking = false;
+            } else {
+                mIsBlocking = false;
+            }
+
+            if(mPlayerNumber == 1 && state[SDL_SCANCODE_R] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_2]) {
+                mIsPunching = true;
+                mIsBlocking = false;
+                mIsKicking = false;
+            } else {
+                mIsPunching = false;
+            }
+
+            if(mPlayerNumber == 1 && state[SDL_SCANCODE_T] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_3]) {
+                mIsKicking = true;
+                mIsBlocking = false;
+                mIsPunching = false;
+            } else {
+                mIsKicking = false;
+            }
         }
 
         if(mPlayerNumber == 1 && state[SDL_SCANCODE_S] || mPlayerNumber == 2 && state[SDL_SCANCODE_DOWN]) {
@@ -94,6 +129,8 @@ void Player::OnUpdate(float deltaTime) {
 }
 
 void Player::ManageAnimations() {
+    mDrawComponent->SetIsPaused(false);
+
     if(mIsDead) {
         mDrawComponent->SetAnimation("dead");
     } else if(mIsOnGround) {
@@ -101,6 +138,13 @@ void Player::ManageAnimations() {
             mDrawComponent->SetAnimation("move");
         } else if(mIsDown) {
             mDrawComponent->SetAnimation("down");
+        } else if (mIsBlocking) {
+            mDrawComponent->SetAnimation("block");
+            mDrawComponent->SetIsPaused(true);
+        } else if (mIsPunching){
+            mDrawComponent->SetAnimation("punch");
+        } else if (mIsKicking){
+            mDrawComponent->SetAnimation("kick");
         } else {
             mDrawComponent->SetAnimation("idle");
         }
