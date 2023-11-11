@@ -68,11 +68,6 @@ public:
         return nullptr;
     }
 
-    // Game specific
-    void SetOnGround() { mIsOnGround = true; };
-    void SetOffGround() { mIsOnGround = false; };
-    bool IsOnGround() const { return mIsOnGround; };
-
     // Any actor-specific collision code (overridable)
     virtual void OnCollision(std::unordered_map<CollisionSide, AABBColliderComponent::Overlap>& responses);
     virtual void Kill();
@@ -95,9 +90,6 @@ protected:
 
     // Components
     std::vector<class Component*> mComponents;
-
-    // Game specific
-    bool mIsOnGround;
 
 private:
     friend class Component;

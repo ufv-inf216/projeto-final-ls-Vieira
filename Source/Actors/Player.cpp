@@ -9,14 +9,19 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Game.h"
 
-Player::Player(Game *game, Vector2 position, int playerNumber, float forwardSpeed, float jumpSpeed)
+#define FLOOR_HEIGHT 50.0f
+
+Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect characterSelect, float forwardSpeed, float jumpSpeed)
         : Actor(game),
-          mIsMoving(false),
           mPlayerNumber(playerNumber),
-          mIsPressingJump(false),
-          mIsDead(false),
+          mCharacterSelect(characterSelect),
           mForwardSpeed(forwardSpeed),
-          mJumpSpeed(jumpSpeed) {
+          mJumpSpeed(jumpSpeed),
+          mIsDead(false),
+          mIsOnGround(true),
+          mIsJumping(false),
+          mIsDown(false),
+          mIsMoving(false) {
 
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 2.5f);
     const float width = 330.0f;
@@ -27,64 +32,49 @@ Player::Player(Game *game, Vector2 position, int playerNumber, float forwardSpee
 
     mRotation = mPlayerNumber == 1 ? Math::Pi : 0.0f;
 
-    if(mPlayerNumber == 1) {
-        mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Goku/Goku.png", "../Assets/Sprites/Goku/Goku.json");
-    } else if (mPlayerNumber == 2) {
-        mDrawComponent = new DrawAnimatedComponent(this, "../Assets/Sprites/Vegeta/Vegeta.png", "../Assets/Sprites/Vegeta/Vegeta.json");
-    }
+    mCharacter = new Character();
 
-    mDrawComponent->AddAnimation("idle", {14, 15, 16});
-    mDrawComponent->AddAnimation("move", {18, 19, 20, 21, 22});
-    mDrawComponent->AddAnimation("jump", {31, 32, 33, 34, 35, 36, 37, 38});
+    mDrawComponent = new DrawAnimatedComponent(this, mCharacter->GetCharacterSpriteSheetPath(mCharacterSelect), mCharacter->GetCharacterSpriteSheetJSON(mCharacterSelect));
+
+    mDrawComponent->AddAnimation("idle", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Idle));
+    mDrawComponent->AddAnimation("move", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Move));
+    mDrawComponent->AddAnimation("jump", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Jump));
+    mDrawComponent->AddAnimation("down", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Down));
 
     mDrawComponent->SetAnimation("idle");
     mDrawComponent->SetAnimFPS(9.0f);
 }
 
 void Player::OnProcessInput(const uint8_t *state) {
-    if(mPlayerNumber == 1) {
-        if (state[SDL_SCANCODE_D]) {
+        if (mPlayerNumber == 1 && state[SDL_SCANCODE_D] || mPlayerNumber == 2 && state[SDL_SCANCODE_RIGHT]) {
             mRigidBodyComponent->ApplyForce(Vector2(mForwardSpeed, 0.0f));
             mIsMoving = true;
         }
 
-        if (state[SDL_SCANCODE_A]) {
+        if (mPlayerNumber == 1 && state[SDL_SCANCODE_A] || mPlayerNumber == 2 && state[SDL_SCANCODE_LEFT]) {
             mRigidBodyComponent->ApplyForce(Vector2(-mForwardSpeed, 0.0f));
             mIsMoving = true;
         }
 
-        if (!state[SDL_SCANCODE_D] && !state[SDL_SCANCODE_A]) {
+        if (mPlayerNumber == 1 && !state[SDL_SCANCODE_D] && !state[SDL_SCANCODE_A] || mPlayerNumber == 2 && !state[SDL_SCANCODE_RIGHT] && !state[SDL_SCANCODE_LEFT]) {
             mIsMoving = false;
         }
 
-        if (state[SDL_SCANCODE_W]) {
+        if (mPlayerNumber == 1 && state[SDL_SCANCODE_W] || mPlayerNumber == 2 && state[SDL_SCANCODE_UP]) {
             if(mIsOnGround){
                 mRigidBodyComponent->SetVelocity(Vector2(mRigidBodyComponent->GetVelocity().x, mJumpSpeed));
-                SetOffGround();
+                mIsOnGround = false;
+                mIsJumping = true;
             }
-        }
-    } else if (mPlayerNumber == 2) {
-        if (state[SDL_SCANCODE_RIGHT]) {
-            mRigidBodyComponent->ApplyForce(Vector2(mForwardSpeed, 0.0f));
-            mIsMoving = true;
+        } else {
+            mIsJumping = false;
         }
 
-        if (state[SDL_SCANCODE_LEFT]) {
-            mRigidBodyComponent->ApplyForce(Vector2(-mForwardSpeed, 0.0f));
-            mIsMoving = true;
+        if(mPlayerNumber == 1 && state[SDL_SCANCODE_S] || mPlayerNumber == 2 && state[SDL_SCANCODE_DOWN]) {
+            mIsDown = true;
+        } else {
+            mIsDown = false;
         }
-
-        if (!state[SDL_SCANCODE_RIGHT] && !state[SDL_SCANCODE_LEFT]) {
-            mIsMoving = false;
-        }
-
-        if (state[SDL_SCANCODE_UP]) {
-            if(mIsOnGround){
-                mRigidBodyComponent->SetVelocity(Vector2(mRigidBodyComponent->GetVelocity().x, mJumpSpeed));
-                SetOffGround();
-            }
-        }
-    }
 }
 
 void Player::OnUpdate(float deltaTime) {
@@ -94,19 +84,30 @@ void Player::OnUpdate(float deltaTime) {
     if (mRigidBodyComponent->GetOwner()->GetPosition().x + mColliderComponent->GetWidth()> mGame->GetWindowWidth())
         mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetWindowWidth() - mColliderComponent->GetWidth(), mRigidBodyComponent->GetOwner()->GetPosition().y));
 
+    if (mRigidBodyComponent->GetOwner()->GetPosition().y + mColliderComponent->GetHeight() > mGame->GetWindowHeight() - FLOOR_HEIGHT){
+        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mRigidBodyComponent->GetOwner()->GetPosition().x, mGame->GetWindowHeight() - mColliderComponent->GetHeight() - FLOOR_HEIGHT));
+        mIsOnGround = true;
+        mIsJumping = false;
+    }
+
     ManageAnimations();
 }
 
 void Player::ManageAnimations() {
     if(mIsDead) {
-//        mDrawComponent->SetAnimation("dead");
-    } else if(mIsOnGround && !mIsMoving) {
-        mDrawComponent->SetAnimation("idle");
-    } else if(mIsOnGround && mIsMoving) {
-        mDrawComponent->SetAnimation("move");
-    } else if(!mIsOnGround) {
-        printf("jump\n");
-        mDrawComponent->SetAnimation("jump");
+        mDrawComponent->SetAnimation("dead");
+    } else if(mIsOnGround) {
+        if(mIsMoving) {
+            mDrawComponent->SetAnimation("move");
+        } else if(mIsDown) {
+            mDrawComponent->SetAnimation("down");
+        } else {
+            mDrawComponent->SetAnimation("idle");
+        }
+    } else {
+        if(mIsJumping) {
+            mDrawComponent->SetAnimation("jump");
+        }
     }
 }
 
@@ -118,13 +119,6 @@ void Player::Kill() {
 
 void Player::OnCollision(std::unordered_map<CollisionSide, AABBColliderComponent::Overlap> &responses) {
     for (auto &response : responses) {
-        if(!mIsPressingJump){
-
-        if (response.second.side == CollisionSide::Down && response.second.target->GetLayer() == ColliderLayer::Ground) {
-            SetOnGround();
-        }
-        }
-
 //        if(response.second.target->GetLayer() == ColliderLayer::Enemy){
 //            if (response.second.side == CollisionSide::Down) {
 //                mRigidBodyComponent->SetVelocity(Vector2(mRigidBodyComponent->GetVelocity().x, mJumpSpeed/1.5f));

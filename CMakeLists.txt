@@ -39,6 +39,8 @@ add_executable(${PROJECT_NAME}
         Source/Actors/Player.h
         Source/Actors/Ground.cpp
         Source/Actors/Ground.h
+        Source/Actors/Utils/Character.cpp
+        Source/Actors/Utils/Character.h
 )
 
 ####### DO NOT EDIT BELLOW

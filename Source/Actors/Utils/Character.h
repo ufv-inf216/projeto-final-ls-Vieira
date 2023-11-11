@@ -5,12 +5,34 @@
 #ifndef SUPER_CAPI_FIGHTERS_CHARACTER_H
 #define SUPER_CAPI_FIGHTERS_CHARACTER_H
 
+#include "../../Game.h"
 
-
-class Character {
-
+enum class CharacterSelect {
+    Goku,
+    Vegeta
 };
 
+enum class CharacterState {
+    Idle,
+    Move,
+    Jump,
+    Down,
+    Punch,
+    Kick,
+    Dead
+};
+
+class Character {
+    public:
+        Character();
+
+        const std::vector<int> GetStateArray(CharacterSelect character, CharacterState state);
+        const std::string GetCharacterSpriteSheetPath(CharacterSelect character);
+        const std::string GetCharacterSpriteSheetJSON(CharacterSelect character);
+    private:
+
+
+};
 
 
 #endif //SUPER_CAPI_FIGHTERS_CHARACTER_H

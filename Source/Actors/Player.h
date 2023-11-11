@@ -7,10 +7,11 @@
 
 #pragma once
 #include "Actor.h"
+#include "Utils/Character.h"
 
 class Player: public Actor {
 public:
-    explicit Player(Game* game, Vector2 position, int playerNumber, float forwardSpeed = 2500.0f, float jumpSpeed = -5000.0f);
+    explicit Player(Game* game, Vector2 position, int playerNumber, CharacterSelect characterSelect, float forwardSpeed = 2500.0f, float jumpSpeed = -5000.0f);
 
     void OnProcessInput(const Uint8* keyState) override;
     void OnUpdate(float deltaTime) override;
@@ -26,14 +27,18 @@ private:
     class AABBColliderComponent* mColliderComponent;
     class DrawPolygonComponent* mDrawPolygonComponent;
 
-    bool mIsMoving;
-    bool mIsDead;
     float mForwardSpeed;
     float mJumpSpeed;
 
-    float mIsPressingJump;
+    bool mIsMoving;
+    bool mIsDead;
+    bool mIsOnGround;
+    bool mIsJumping;
+    bool mIsDown;
 
     int mPlayerNumber;
+    Character* mCharacter;
+    CharacterSelect mCharacterSelect;
 };
 
 
