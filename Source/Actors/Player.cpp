@@ -24,7 +24,8 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
           mIsBlocking(false),
           mIsPunching(false),
           mIsKicking(false),
-          mIsMoving(false) {
+          mIsMoving(false),
+          mFightStatus(FightStatus::Fight) {
 
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 2.5f);
     const float width = 330.0f;
@@ -44,17 +45,31 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
     mDrawComponent->AddAnimation("jump", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Jump));
     mDrawComponent->AddAnimation("down", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Down));
     mDrawComponent->AddAnimation("block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Block));
+    mDrawComponent->AddAnimation("jump_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpBlock));
+    mDrawComponent->AddAnimation("down_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownBlock));
     mDrawComponent->AddAnimation("punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Punch));
+    mDrawComponent->AddAnimation("jump_punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpPunch));
+    mDrawComponent->AddAnimation("down_punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownPunch));
     mDrawComponent->AddAnimation("kick", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Kick));
+    mDrawComponent->AddAnimation("jump_kick", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpKick));
+    mDrawComponent->AddAnimation("down_kick", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownKick));
     mDrawComponent->AddAnimation("dead", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Dead));
+    mDrawComponent->AddAnimation("win", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Win));
+    mDrawComponent->AddAnimation("lose", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Lose));
 
     mDrawComponent->SetAnimation("idle");
     mDrawComponent->SetAnimFPS(7.0f);
 }
 
 void Player::OnProcessInput(const uint8_t *state) {
-        if(state[SDL_SCANCODE_ESCAPE]){
+        if(state[SDL_SCANCODE_I]){ // FIXME Only to test animation
             mIsDead = true;
+        }
+        if(state[SDL_SCANCODE_O]){ // FIXME Only to test animation
+            mFightStatus = FightStatus::Win;
+        }
+        if(state[SDL_SCANCODE_P]){ // FIXME Only to test animation
+            mFightStatus = FightStatus::Lose;
         }
 
         if (mPlayerNumber == 1 && state[SDL_SCANCODE_D] || mPlayerNumber == 2 && state[SDL_SCANCODE_RIGHT]) {
@@ -77,33 +92,31 @@ void Player::OnProcessInput(const uint8_t *state) {
                 mIsOnGround = false;
                 mIsJumping = true;
             }
-        } else {
-            mIsJumping = false;
-
-            if(mPlayerNumber == 1 && state[SDL_SCANCODE_E] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_1]) {
-                mIsBlocking = true;
-                mIsPunching = false;
-                mIsKicking = false;
-            } else {
-                mIsBlocking = false;
-            }
-
-            if(mPlayerNumber == 1 && state[SDL_SCANCODE_R] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_2]) {
-                mIsPunching = true;
-                mIsBlocking = false;
-                mIsKicking = false;
-            } else {
-                mIsPunching = false;
-            }
-
-            if(mPlayerNumber == 1 && state[SDL_SCANCODE_T] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_3]) {
-                mIsKicking = true;
-                mIsBlocking = false;
-                mIsPunching = false;
-            } else {
-                mIsKicking = false;
-            }
         }
+
+    if(mPlayerNumber == 1 && state[SDL_SCANCODE_E] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_1]) {
+        mIsBlocking = true;
+        mIsPunching = false;
+        mIsKicking = false;
+    } else {
+        mIsBlocking = false;
+    }
+
+    if(mPlayerNumber == 1 && state[SDL_SCANCODE_R] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_2]) {
+        mIsPunching = true;
+        mIsBlocking = false;
+        mIsKicking = false;
+    } else {
+        mIsPunching = false;
+    }
+
+    if(mPlayerNumber == 1 && state[SDL_SCANCODE_T] || mPlayerNumber == 2 && state[SDL_SCANCODE_KP_3]) {
+        mIsKicking = true;
+        mIsBlocking = false;
+        mIsPunching = false;
+    } else {
+        mIsKicking = false;
+    }
 
         if(mPlayerNumber == 1 && state[SDL_SCANCODE_S] || mPlayerNumber == 2 && state[SDL_SCANCODE_DOWN]) {
             mIsDown = true;
@@ -131,28 +144,53 @@ void Player::OnUpdate(float deltaTime) {
 void Player::ManageAnimations() {
     mDrawComponent->SetIsPaused(false);
 
-    if(mIsDead) {
-        mDrawComponent->SetAnimation("dead");
-    } else if(mIsOnGround) {
-        if(mIsMoving) {
-            mDrawComponent->SetAnimation("move");
-        } else if(mIsDown) {
-            mDrawComponent->SetAnimation("down");
-        } else if (mIsBlocking) {
-            mDrawComponent->SetAnimation("block");
-            mDrawComponent->SetIsPaused(true);
-        } else if (mIsPunching){
-            mDrawComponent->SetAnimation("punch");
-        } else if (mIsKicking){
-            mDrawComponent->SetAnimation("kick");
+    if(mFightStatus == FightStatus::Win)
+        mDrawComponent->SetAnimation("win");
+    else if(mFightStatus == FightStatus::Lose)
+        mDrawComponent->SetAnimation("lose");
+    else {
+        if(mIsDead) {
+            mDrawComponent->SetAnimation("dead");
+        } else if(mIsOnGround) {
+            if(mIsMoving) {
+                mDrawComponent->SetAnimation("move");
+            } else if(mIsDown) {
+                if(mIsBlocking){
+                    mDrawComponent->SetAnimation("down_block");
+                    mDrawComponent->SetIsPaused(true);
+                } else if (mIsPunching){
+                    mDrawComponent->SetAnimation("down_punch");
+                } else if (mIsKicking){
+                    mDrawComponent->SetAnimation("down_kick");
+                } else {
+                    mDrawComponent->SetAnimation("down");
+                    mDrawComponent->SetIsPaused(true);
+                }
+            } else if (mIsBlocking) {
+                mDrawComponent->SetAnimation("block");
+                mDrawComponent->SetIsPaused(true);
+            } else if (mIsPunching){
+                mDrawComponent->SetAnimation("punch");
+            } else if (mIsKicking){
+                mDrawComponent->SetAnimation("kick");
+            } else {
+                mDrawComponent->SetAnimation("idle");
+            }
         } else {
-            mDrawComponent->SetAnimation("idle");
-        }
-    } else {
-        if(mIsJumping) {
-            mDrawComponent->SetAnimation("jump");
+            if(mIsJumping) {
+                if(mIsBlocking){
+                    mDrawComponent->SetAnimation("jump_block");
+                } else if (mIsPunching){
+                    mDrawComponent->SetAnimation("jump_punch");
+                } else if (mIsKicking){
+                    mDrawComponent->SetAnimation("jump_kick");
+                } else {
+                    mDrawComponent->SetAnimation("jump");
+                }
+            }
         }
     }
+
 }
 
 void Player::Kill() {

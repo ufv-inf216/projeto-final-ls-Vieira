@@ -19,34 +19,66 @@ const std::vector<int> Character::GetStateArray(CharacterSelect character, Chara
                 case CharacterState::Jump:
                     return {33, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40};
                 case CharacterState::Down:
-                    return {14, 15, 16, 17};
+                    return {41, 42, 43};
                 case CharacterState::Block:
                     return {24, 25, 26};
+                case CharacterState::JumpBlock:
+                    return {30, 31, 32};
+                case CharacterState::DownBlock:
+                    return {27, 28, 29};
                 case CharacterState::Punch:
-                    return {49, 50, 51, 52, 53, 54, 55, 56};
+                    return {58, 59, 60, 61};
+                case CharacterState::JumpPunch:
+                    return {88, 89, 90, 91, 92, 93};
+                case CharacterState::DownPunch:
+                    return {74, 75, 76, 77};
                 case CharacterState::Kick:
-                    return {57, 58, 59, 60, 61, 62, 63, 64};
+                    return {62, 63, 64, 65, 66, 67};
+                case CharacterState::JumpKick:
+                    return {84, 85, 86, 87};
+                case CharacterState::DownKick:
+                    return {78, 79, 80, 81, 82, 83};
                 case CharacterState::Dead:
-                    return {65, 66, 67, 68, 69, 70, 71, 72};
+                    return {268, 269, 270, 271, 272, 273, 274, 274};
+                case CharacterState::Win:
+                    return {275, 276, 277, 278, 279, 280, 281, 282};
+                case CharacterState::Lose:
+                    return {283, 284, 285, 286};
             }
         case CharacterSelect::Vegeta:
             switch (state) {
                 case CharacterState::Idle:
-                    return {9, 10, 11, 12};
+                    return {9, 10, 11, 12, 13};
                 case CharacterState::Move:
-                    return {18, 19, 20, 21, 22, 23};
+                    return {17, 18, 19, 20, 21, 22};
                 case CharacterState::Jump:
-                    return {33, 34, 35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40};
+                    return {32, 33, 34, 35, 35, 36, 36, 37, 37, 38, 38};
                 case CharacterState::Down:
-                    return {14, 15, 16, 17};
+                    return {39, 40, 41};
                 case CharacterState::Block:
-                    return {24, 25, 26};
+                    return {23, 24, 25};
+                case CharacterState::JumpBlock:
+                    return {29, 30, 31};
+                case CharacterState::DownBlock:
+                    return {26, 27, 28};
                 case CharacterState::Punch:
-                    return {49, 50, 51, 52, 53, 54, 55, 56};
+                    return {59, 60, 61, 62};
+                case CharacterState::JumpPunch:
+                    return {89, 90, 91, 92, 93, 94};
+                case CharacterState::DownPunch:
+                    return {78, 79, 80, 81, 82, 83, 84};
                 case CharacterState::Kick:
-                    return {57, 58, 59, 60, 61, 62, 63, 64};
+                    return {109, 110, 111, 112, 113, 114};
+                case CharacterState::JumpKick:
+                    return {104, 105, 106, 107, 108};
+                case CharacterState::DownKick:
+                    return {74, 75, 76, 77};
                 case CharacterState::Dead:
-                    return {65, 66, 67, 68, 69, 70, 71, 72};
+                    return {258, 259, 260, 261, 262, 263, 264, 265};
+                case CharacterState::Win:
+                    return {274, 275, 276, 277, 278, 279, 280, 281, 282};
+                case CharacterState::Lose:
+                    return {283, 284, 285, 286, 287, 288};
             }
     }
 }

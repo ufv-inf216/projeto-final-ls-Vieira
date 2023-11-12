@@ -9,6 +9,12 @@
 #include "Actor.h"
 #include "Utils/Character.h"
 
+enum class FightStatus {
+    Fight,
+    Win,
+    Lose
+};
+
 class Player: public Actor {
 public:
     explicit Player(Game* game, Vector2 position, int playerNumber, CharacterSelect characterSelect, float forwardSpeed = 2500.0f, float jumpSpeed = -5000.0f);
@@ -38,6 +44,9 @@ private:
     bool mIsPunching;
     bool mIsKicking;
     bool mIsDown;
+
+
+    FightStatus mFightStatus;
 
     int mPlayerNumber;
     Character* mCharacter;

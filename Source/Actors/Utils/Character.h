@@ -18,9 +18,17 @@ enum class CharacterState {
     Jump,
     Down,
     Block,
+    JumpBlock,
+    DownBlock,
     Punch,
+    JumpPunch,
+    DownPunch,
     Kick,
-    Dead
+    JumpKick,
+    DownKick,
+    Dead,
+    Win,
+    Lose
 };
 
 class Character {
