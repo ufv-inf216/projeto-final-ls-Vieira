@@ -64,13 +64,21 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
 void Player::OnProcessInput(const uint8_t *state) {
         if(state[SDL_SCANCODE_I]){ // FIXME Only to test animation
             mIsDead = true;
+        } else {
+            mIsDead = false;
         }
+
         if(state[SDL_SCANCODE_O]){ // FIXME Only to test animation
             mFightStatus = FightStatus::Win;
+        } else {
+            if(state[SDL_SCANCODE_P]){ // FIXME Only to test animation
+                mFightStatus = FightStatus::Lose;
+            } else {
+                mFightStatus = FightStatus::Fight;
+            }
         }
-        if(state[SDL_SCANCODE_P]){ // FIXME Only to test animation
-            mFightStatus = FightStatus::Lose;
-        }
+
+
 
         if (mPlayerNumber == 1 && state[SDL_SCANCODE_D] || mPlayerNumber == 2 && state[SDL_SCANCODE_RIGHT]) {
             mRigidBodyComponent->ApplyForce(Vector2(mForwardSpeed, 0.0f));
