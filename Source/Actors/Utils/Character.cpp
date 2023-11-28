@@ -48,7 +48,7 @@ const std::vector<int> Character::GetStateArray(CharacterSelect character, Chara
         case CharacterSelect::Vegeta:
             switch (state) {
                 case CharacterState::Idle:
-                    return {9, 10, 11, 12, 13};
+                    return {9, 10, 11, 12};
                 case CharacterState::Move:
                     return {17, 18, 19, 20, 21, 22};
                 case CharacterState::Jump:
