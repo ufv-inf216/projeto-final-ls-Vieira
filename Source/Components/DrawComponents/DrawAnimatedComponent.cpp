@@ -50,10 +50,10 @@ void DrawAnimatedComponent::Draw(SDL_Renderer *renderer) {
     int width = mSpriteSheetData[spriteIdx]->w * 3;
     int heigth = mSpriteSheetData[spriteIdx]->h * 3;
 
-    mOwner->GetComponent<AABBColliderComponent>()->SetSize(width, heigth);
-    mOwner->GetComponent<DrawPolygonComponent>()->Update(width, heigth);
+//    mOwner->GetComponent<AABBColliderComponent>()->SetSize(width, heigth);
+//    mOwner->GetComponent<DrawPolygonComponent>()->Update(width, heigth);
 
-    SDL_Rect mDrawRect = {int(drawPosition.x), int(drawPosition.y), width, heigth};
+    SDL_Rect mDrawRect = {int(drawPosition.x - width / 2), int(drawPosition.y - heigth / 2), width, heigth};
     SDL_RendererFlip flip = mOwner->GetRotation() == 0.0f ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
     SDL_RenderCopyEx(renderer, mSpriteSheetSurface, mSpriteSheetData[spriteIdx], &mDrawRect, mOwner->GetRotation(), nullptr, flip);
 }

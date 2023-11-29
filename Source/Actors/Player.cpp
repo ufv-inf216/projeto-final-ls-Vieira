@@ -30,7 +30,7 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 2.5f);
     const float width = 330.0f;
     const float height = 330.0f;
-    mColliderComponent = new AABBColliderComponent(this, 0, 0, width, height, ColliderLayer::Player);
+    mColliderComponent = new AABBColliderComponent(this, width, 0, width/2, height/2, ColliderLayer::Player);
 
     mDrawPolygonComponent = new DrawPolygonComponent(this, width, height);
 

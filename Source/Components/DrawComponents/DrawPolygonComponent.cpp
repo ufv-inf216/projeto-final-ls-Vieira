@@ -10,7 +10,7 @@ DrawPolygonComponent::DrawPolygonComponent(class Actor* owner, int width, int he
         :DrawComponent(owner)
         ,mDrawOrder(drawOrder)
 {
-    mVertices = {Vector2(0, 0), Vector2(width, 0), Vector2(width, height), Vector2(0, height)};
+    mVertices = {Vector2(-width/2, -height/2), Vector2(width/2, -height/2), Vector2(width/2, height/2), Vector2(-width/2, height/2)};
 }
 
 void DrawPolygonComponent::Draw(SDL_Renderer *renderer)
