@@ -24,7 +24,7 @@ AABBColliderComponent::~AABBColliderComponent()
 
 Vector2 AABBColliderComponent::GetMin() const
 {
-   return mOwner->GetPosition() + mOffset;
+    return mOwner->GetPosition() + mOffset;
 }
 
 Vector2 AABBColliderComponent::GetMax() const

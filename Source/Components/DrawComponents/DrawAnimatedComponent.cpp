@@ -43,17 +43,14 @@ void DrawAnimatedComponent::LoadSpriteSheet(const std::string &texturePath, cons
 }
 
 void DrawAnimatedComponent::Draw(SDL_Renderer *renderer) {
-    int spriteIdx = mAnimations[mAnimName][int(mAnimTimer)];
+    int spriteIdx = mAnimations[mAnimName].first[int(mAnimTimer)];
 
     Vector2 drawPosition = mOwner->GetPosition() - GetGame()->GetCameraPos();
 
     int width = mSpriteSheetData[spriteIdx]->w * 3;
-    int heigth = mSpriteSheetData[spriteIdx]->h * 3;
+    int height = mSpriteSheetData[spriteIdx]->h * 3;
 
-//    mOwner->GetComponent<AABBColliderComponent>()->SetSize(width, heigth);
-//    mOwner->GetComponent<DrawPolygonComponent>()->Update(width, heigth);
-
-    SDL_Rect mDrawRect = {int(drawPosition.x - width / 2), int(drawPosition.y - heigth / 2), width, heigth};
+    SDL_Rect mDrawRect = {int(drawPosition.x - width / 2), int(drawPosition.y - height / 2), width, height};
     SDL_RendererFlip flip = mOwner->GetRotation() == 0.0f ? SDL_FLIP_NONE : SDL_FLIP_HORIZONTAL;
     SDL_RenderCopyEx(renderer, mSpriteSheetSurface, mSpriteSheetData[spriteIdx], &mDrawRect, mOwner->GetRotation(), nullptr, flip);
 }
@@ -64,8 +61,13 @@ void DrawAnimatedComponent::Update(float deltaTime) {
 
     mAnimTimer += mAnimFPS * deltaTime;
 
-    while (mAnimTimer >= mAnimations[mAnimName].size()) {
-        mAnimTimer = int(mAnimTimer) - mAnimations[mAnimName].size();
+    for(int i = 0; i < mAnimations[mAnimName].first.size(); i++) {
+        if(mAnimTimer >= mAnimations[mAnimName].first.size()) {
+            if(mAnimations[mAnimName].second)
+                mAnimTimer = int(mAnimTimer) - mAnimations[mAnimName].first.size();
+            else
+                mAnimTimer = mAnimations[mAnimName].first.size() - 1;
+        }
     }
 }
 
@@ -74,6 +76,6 @@ void DrawAnimatedComponent::SetAnimation(const std::string &name) {
     Update(0.0f);
 }
 
-void DrawAnimatedComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums) {
-    mAnimations.emplace(name, spriteNums);
+void DrawAnimatedComponent::AddAnimation(const std::string &name, const std::vector<int> &spriteNums, const bool isLooping) {
+    mAnimations.emplace(name, make_pair(spriteNums, isLooping));
 }

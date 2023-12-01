@@ -30,7 +30,8 @@ private:
 
     class RigidBodyComponent* mRigidBodyComponent;
     class DrawAnimatedComponent* mDrawComponent;
-    class AABBColliderComponent* mColliderComponent;
+    class AABBColliderComponent* mMovementColliderComponent;
+    class AABBColliderComponent* mAttackColliderComponent;
     class DrawPolygonComponent* mDrawPolygonComponent;
 
     float mForwardSpeed;

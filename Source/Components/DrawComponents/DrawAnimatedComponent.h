@@ -6,6 +6,7 @@
 
 #include "DrawSpriteComponent.h"
 #include <unordered_map>
+#include <utility>
 
 class DrawAnimatedComponent : public DrawSpriteComponent {
 public:
@@ -26,7 +27,7 @@ public:
     void SetIsPaused(bool pause) { mIsPaused = pause; }
 
     // Add an animation of the corresponding name to the animation map
-    void AddAnimation(const std::string& name, const std::vector<int>& images);
+    void AddAnimation(const std::string& name, const std::vector<int>& images, const bool isLooping = true);
 
     // Get the current animation name
     const std::string& GetAnimName() const { return mAnimName; }
@@ -38,7 +39,7 @@ private:
     std::vector<SDL_Rect*> mSpriteSheetData;
 
     // Map of animation name to vector of textures corresponding to the animation
-    std::unordered_map<std::string, std::vector<int>> mAnimations;
+    std::unordered_map<std::string, std::pair<std::vector<int>, bool>> mAnimations;
 
     // Name of current animation
     std::string mAnimName;

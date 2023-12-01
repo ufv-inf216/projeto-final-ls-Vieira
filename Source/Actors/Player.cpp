@@ -30,7 +30,8 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
     mRigidBodyComponent = new RigidBodyComponent(this, 1.0f, 2.5f);
     const float width = 330.0f;
     const float height = 330.0f;
-    mColliderComponent = new AABBColliderComponent(this, width, 0, width/2, height/2, ColliderLayer::Player);
+
+    mMovementColliderComponent = new AABBColliderComponent(this, 0, 0, 200, height, ColliderLayer::Player);
 
     mDrawPolygonComponent = new DrawPolygonComponent(this, width, height);
 
@@ -43,10 +44,10 @@ Player::Player(Game *game, Vector2 position, int playerNumber, CharacterSelect c
     mDrawComponent->AddAnimation("idle", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Idle));
     mDrawComponent->AddAnimation("move", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Move));
     mDrawComponent->AddAnimation("jump", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Jump));
-    mDrawComponent->AddAnimation("down", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Down));
-    mDrawComponent->AddAnimation("block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Block));
-    mDrawComponent->AddAnimation("jump_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpBlock));
-    mDrawComponent->AddAnimation("down_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownBlock));
+    mDrawComponent->AddAnimation("down", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Down), false);
+    mDrawComponent->AddAnimation("block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Block), false);
+    mDrawComponent->AddAnimation("jump_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpBlock), false);
+    mDrawComponent->AddAnimation("down_block", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownBlock), false);
     mDrawComponent->AddAnimation("punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::Punch));
     mDrawComponent->AddAnimation("jump_punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::JumpPunch));
     mDrawComponent->AddAnimation("down_punch", mCharacter->GetStateArray(mCharacterSelect, CharacterState::DownPunch));
@@ -134,14 +135,14 @@ void Player::OnProcessInput(const uint8_t *state) {
 }
 
 void Player::OnUpdate(float deltaTime) {
-    if (mRigidBodyComponent->GetOwner()->GetPosition().x < mGame->GetCameraPos().x)
-        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetCameraPos().x, mRigidBodyComponent->GetOwner()->GetPosition().y));
+    if (mRigidBodyComponent->GetOwner()->GetPosition().x - mMovementColliderComponent->GetWidth() /2 < mGame->GetCameraPos().x)
+        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetCameraPos().x + mMovementColliderComponent->GetWidth() /2, mRigidBodyComponent->GetOwner()->GetPosition().y));
 
-    if (mRigidBodyComponent->GetOwner()->GetPosition().x + mColliderComponent->GetWidth()> mGame->GetWindowWidth())
-        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetWindowWidth() - mColliderComponent->GetWidth(), mRigidBodyComponent->GetOwner()->GetPosition().y));
+    if (mRigidBodyComponent->GetOwner()->GetPosition().x + mMovementColliderComponent->GetWidth()/2 > mGame->GetWindowWidth())
+        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mGame->GetWindowWidth() - mMovementColliderComponent->GetWidth()/2, mRigidBodyComponent->GetOwner()->GetPosition().y));
 
-    if (mRigidBodyComponent->GetOwner()->GetPosition().y + mColliderComponent->GetHeight() > mGame->GetWindowHeight() - FLOOR_HEIGHT){
-        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mRigidBodyComponent->GetOwner()->GetPosition().x, mGame->GetWindowHeight() - mColliderComponent->GetHeight() - FLOOR_HEIGHT));
+    if (mRigidBodyComponent->GetOwner()->GetPosition().y + mMovementColliderComponent->GetHeight()/2 > mGame->GetWindowHeight() - FLOOR_HEIGHT){
+        mRigidBodyComponent->GetOwner()->SetPosition(Vector2(mRigidBodyComponent->GetOwner()->GetPosition().x, mGame->GetWindowHeight() - mMovementColliderComponent->GetHeight()/2 - FLOOR_HEIGHT));
         mIsOnGround = true;
         mIsJumping = false;
     }
@@ -150,8 +151,6 @@ void Player::OnUpdate(float deltaTime) {
 }
 
 void Player::ManageAnimations() {
-    mDrawComponent->SetIsPaused(false);
-
     if(mFightStatus == FightStatus::Win)
         mDrawComponent->SetAnimation("win");
     else if(mFightStatus == FightStatus::Lose)
@@ -162,21 +161,18 @@ void Player::ManageAnimations() {
         } else if(mIsOnGround) {
             if(mIsMoving) {
                 mDrawComponent->SetAnimation("move");
-            } else if(mIsDown) {
+            } if(mIsDown) {
                 if(mIsBlocking){
                     mDrawComponent->SetAnimation("down_block");
-                    mDrawComponent->SetIsPaused(true);
                 } else if (mIsPunching){
                     mDrawComponent->SetAnimation("down_punch");
                 } else if (mIsKicking){
                     mDrawComponent->SetAnimation("down_kick");
                 } else {
                     mDrawComponent->SetAnimation("down");
-                    mDrawComponent->SetIsPaused(true);
                 }
             } else if (mIsBlocking) {
                 mDrawComponent->SetAnimation("block");
-                mDrawComponent->SetIsPaused(true);
             } else if (mIsPunching){
                 mDrawComponent->SetAnimation("punch");
             } else if (mIsKicking){
@@ -204,7 +200,7 @@ void Player::ManageAnimations() {
 void Player::Kill() {
     mDrawComponent->SetAnimation("dead");
     mIsDead = true;
-    mColliderComponent->SetEnabled(false);
+    mMovementColliderComponent->SetEnabled(false);
 }
 
 void Player::OnCollision(std::unordered_map<CollisionSide, AABBColliderComponent::Overlap> &responses) {
